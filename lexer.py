@@ -1,11 +1,7 @@
 import ply.lex as lex
 import re
 
-# ==========================================
-# 1. Palabras Reservadas
-# ==========================================
-
-# Palabras Reservadas (Control y Lógica)
+# Palabras Reservadas
 reserved_control = {
     'when': 'WHEN',
     'every': 'EVERY',
@@ -19,7 +15,6 @@ reserved_control = {
     'not': 'NOT'
 }
 
-# Palabras Reservadas de Atributos (Propiedades de dispositivos)
 reserved_attributes = {
     'estado': 'ESTADO',
     'brillo': 'BRILLO',
@@ -28,8 +23,8 @@ reserved_attributes = {
     'temp_obj': 'TEMP_OBJ',
     'temp_act': 'TEMP_ACT',
     'posicion': 'POSICION',
-    'hora': 'HORA_ATTR',   # Diferenciado de TOKEN_HORA
-    'fecha': 'FECHA_ATTR', # Diferenciado de TOKEN_FECHA
+    'hora': 'HORA_ATTR',   
+    'fecha': 'FECHA_ATTR',
     'volumen': 'VOLUMEN',
     'mute': 'MUTE',
     'mensaje': 'MENSAJE',
@@ -37,7 +32,6 @@ reserved_attributes = {
     'activada': 'ACTIVADA'
 }
 
-# Booleanos y Discretos
 reserved_literals = {
     'true': 'TRUE',
     'false': 'FALSE',
@@ -51,7 +45,6 @@ reserved_literals = {
     'vent': 'VENT'
 }
 
-# Unidades (Sufijos)
 reserved_units = {
     'lux': 'LUX',
     'm': 'M',
@@ -59,42 +52,31 @@ reserved_units = {
     'h': 'H'
 }
 
-# Unimos todas las palabras reservadas en un solo diccionario
+# Union de las palabras reservadas con diccionarios
 reserved = {}
 reserved.update(reserved_control)
 reserved.update(reserved_attributes)
 reserved.update(reserved_literals)
 reserved.update(reserved_units)
 
-# ==========================================
-# 2. Lista de Tokens
-# ==========================================
-
+# Tokens
 tokens = [
-    # Operadores y Delimitadores
+    
     'IGUALDAD', 'DISTINTO', 'MAYOR_IGUAL', 'MENOR_IGUAL', 'MAYOR', 'MENOR', 'ASIGNACION', 'PUNTO',
     
-    # Identificadores Estrictos de Dispositivos (Actuadores y Sensores)
     'FOCO_ID', 'AIRE_ID', 'PERSIANA_ID', 'CERRADURA_ID', 'RELOJ_ID', 'ALTAVOZ_ID', 'ALARMA_ID',
     'SENSOR_ID_TEMP', 'SENSOR_ID_HUMEDAD', 'SENSOR_ID_LUZ', 'SENSOR_ID_MOVIMIENTO', 'SENSOR_ID_HUMO',
     
-    # Literales Complejos
     'TOKEN_NUMERO', 'TOKEN_HORA', 'TOKEN_FECHA', 'TOKEN_EMAIL', 'TOKEN_TEXTO',
     
-    # Unidades Especiales
     'PORCENTAJE', 'GRADOS_C',
     
-    # Identificador Genérico
     'ID',
-    
-    # Comentarios
+
     'COMMENT'
 ] + list(reserved.values())
 
-# ==========================================
-# 3. Expresiones Regulares Simples
-# ==========================================
-
+# Expresiones regulares
 t_IGUALDAD    = r'=='
 t_DISTINTO    = r'!='
 t_MAYOR_IGUAL = r'>='
@@ -106,13 +88,9 @@ t_PUNTO       = r'\.'
 
 t_PORCENTAJE  = r'%'
 
-# Caracteres a ignorar (espacios, tabulaciones y retornos de carro)
 t_ignore = ' \t\r'
 
-# ==========================================
-# 4. Reglas Complejas (Funciones)
-# ==========================================
-
+#Reglas
 def t_COMMENT(t):
     r'//.*'
     return t
@@ -131,8 +109,6 @@ def t_TOKEN_EMAIL(t):
 
 def t_TOKEN_NUMERO(t):
     r'-?\d+(\.\d+)?'
-    # No convertimos a float aquí para mantener el string en t.value, 
-    # pero el parser podrá hacerlo luego.
     return t
 
 def t_TOKEN_TEXTO(t):
@@ -148,7 +124,6 @@ def t_ID(t):
     
     val_lower = t.value.lower()
     
-    # Comprobar si es palabra reservada
     if val_lower in reserved:
         t.type = reserved[val_lower]
         return t
@@ -189,10 +164,7 @@ def t_error(t):
 # Construir el analizador léxico con ignorar mayúsculas/minúsculas en las regex
 lexer = lex.lex(reflags=re.IGNORECASE)
 
-# ==========================================
-# 5. Bloque Principal - Consola Interactiva
-# ==========================================
-
+# Consola interactiva
 if __name__ == '__main__':
     print("Iniciando Smart-Home Lexer Console...")
     print("Escribe 'salir', 'exit' o 'quit' para terminar.\n")
